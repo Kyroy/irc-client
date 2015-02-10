@@ -6,29 +6,30 @@ ClientIRC = function(server, nick, options, display, ircOptions) {
     self.server = server;
     self.nick = nick;
     self.options = {
-        debug: true
+        debug: true,
+        db: new Meteor.Collection('irc')
     };
     self.display = {
         registered: true,
         motd: true,
-        names: true, // may be deleted
-        topic: true,
-        join: true,
-        part: true,
-        quit: true,
-        kick: true,
-        kill: true,
+        // names: true, // may be deleted
+        // topic: true,
+        // join: true,
+        // part: true,
+        // quit: true,
+        // kick: true,
+        // kill: true,
         message: true,
-        // message#: true,
-        // pm: true,
-        notice: true,
-        // ctcp??
-        nick: true,
-        invite: true,
-        plusMode: true,
-        minusMode: true,
-        whois: true,
-        raw: true,
+        // message#: false,
+        // pm: false,
+        // notice: true,
+        // // ctcp??
+        // nick: true,
+        // invite: true,
+        // plusMode: true,
+        // minusMode: true,
+        // whois: true,
+        // raw: true,
         error: true
     };
     self.ircOptions = {
@@ -89,15 +90,20 @@ _debug = function(message) {
 ClientIRC.prototype.connect = function() {
     var self = this;
     self.client = new irc.Client(self.server, self.nick, self.ircOptions);
-    if (self.display.message) {
-        self.client.addListener('message', self._message);
+
+    var keys = Object.keys(self.display);
+    for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        if (self.display[k]) {
+            self.client.addListener(k, self['_' + k]);
+        }
     }
 };
 
 /**
  * Emitted when the server sends the initial 001 line, indicating you’ve
  * connected to the server. See the raw event for details on the message object.
- * @param {string} message
+ * @param {object} message
  */
 ClientIRC.prototype._registered = function(message) {
     console.log('registered:', message);
@@ -119,9 +125,18 @@ ClientIRC.prototype._motd = function(motd) {
  * @param {string} nick
  * @param {string} to
  * @param {string} text
- * @param {string} message
+ * @param {object} message
  */
 ClientIRC.prototype._message = function(nick, to, text, message) {
     _debug('message: ' + nick + ' => ' + to + ': ' + text);
+    _debug(message);
+};
+
+/**
+ * Emitted when ever the server responds with an error-type message.
+ * The message parameter is exactly as in the ‘raw’ event.
+ * @param {string} message
+ */
+ClientIRC.prototype._error = function(message) {
     _debug(message);
 };
