@@ -13,7 +13,7 @@ Package.describe({
 Package.onUse(function(api) {
     api.versionsFrom('1.0.3.1');
     api.export('ClientIRC');
-    api.addFiles(['kyroy:irc-client.js'], ['server']);
+    api.addFiles('irc-client.js', 'server');
 });
 
 Npm.depends({
@@ -22,6 +22,6 @@ Npm.depends({
 
 Package.onTest(function(api) {
     api.use('tinytest');
-    api.use('kyroy:clientirc');
+    api.use('kyroy:irc-client');
     api.addFiles('kyroy:irc-client-tests.js');
 });
