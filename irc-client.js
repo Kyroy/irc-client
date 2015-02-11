@@ -109,6 +109,29 @@ ClientIRC.prototype.connect = function() {
     }
 };
 
+///**
+// * Sends a raw message to the server; generally speaking, it’s best not to use this
+// * method unless you know what you’re doing. Instead, use one of the methods below.
+// *
+// * @param {string} command
+// * @param arguments
+// */
+//ClientIRC.prototype.send = function(command) {
+//
+//};
+
+//ClientIRC.prototype.join = function(channel, callback) {
+//    var self = this;
+//    if (typeof self.client === 'object') {
+//        self.client.join(channel, callback);
+//    }
+//};
+
+
+//--------------------------------------------------------------------
+//-- Events
+//--------------------------------------------------------------------
+
 /**
  * Emitted when the server sends the initial 001 line, indicating you’ve
  * connected to the server. See the raw event for details on the message object.
@@ -383,5 +406,5 @@ ClientIRC.prototype._raw = function(message) {
  * @param {string} message
  */
 ClientIRC.prototype._error = function(message) {
-    _debug(message);
+    console.log('ClientIRC ERROR:', message);
 };
