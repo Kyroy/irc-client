@@ -9,18 +9,18 @@ meteor add kyroy:irc-client
 ```
 
 ## Basic Usage
-```
+```js
 var client = ClientIRC('irc.yourserver.com', 'myNick');
 client.join('#yourChannel');
 ```
 
 ### Constructor
-```
+```js
 ClientIRC(server, nick[, options, display, ircOptions])
 ```
 The first two arguments are the server to connect to and the nickname to attempt to use.
 The other arguments are optional with the following default values:
-```
+```js
 options = {
     debug: true,
     db: new Meteor.Collection('irc')
@@ -53,7 +53,7 @@ ircOptions = {
 ```
 
 ### Change IRC Port
-```
+```js
 var client = ClientIRC('irc.yourserver.com', 'myNick', undefined, undefined, {
     port: 12345
 });
