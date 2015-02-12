@@ -2,10 +2,15 @@ irc = Npm.require('irc');
 
 ClientIRC = function(server, nick, actions, options) {
     var self = this;
+    self.client = null;
     self.server = server;
     self.nick = nick;
     self.actions = actions;
     self.options = options;
+
+    // private:
+    self.toJoin = [];
+    self.connected = false;
 
     if (typeof arguments[2] == 'object') {
         var keys = Object.keys(self.actions);
@@ -28,6 +33,15 @@ ClientIRC = function(server, nick, actions, options) {
     }
 
     self.client = new irc.Client(self.server, self.nick, self.options);
+    var obj = self;
+    self.client.addListener('registered', function(message) {
+        self.connected = true;
+        var chan = self.toJoin.pop();
+        while (chan) {
+            self.join(chan);
+            chan = self.toJoin.pop();
+        }
+    });
 
     var keys = Object.keys(self.actions);
     for (var i = 0; i < keys.length; i++) {
@@ -57,8 +71,10 @@ ClientIRC = function(server, nick, actions, options) {
  */
 ClientIRC.prototype.join = function(channel, callback) {
     var self = this;
-    if (typeof self.client === 'object') {
+    if (self.connected) {
         self.client.join(channel, callback);
+    } else {
+        self.toJoin.push(channel);
     }
 };
 
@@ -96,7 +112,7 @@ ClientIRC.prototype.say = function(target, message) {
  * @param {string} target - is either a nickname, or a channel.
  * @param {string} type - the type of the CTCP message. Specify “privmsg” for a PRIVMSG,
  *     and anything else for a NOTICE.
- * @param text - the CTCP message to send.
+ * @param {string} text - the CTCP message to send.
  */
 ClientIRC.prototype.ctcp = function(target, type, text) {
     var self = this;
@@ -108,8 +124,8 @@ ClientIRC.prototype.ctcp = function(target, type, text) {
 /**
  * Sends an action to the specified target.
  *
- * @param target
- * @param message
+ * @param {string} target
+ * @param {string} message
  */
 ClientIRC.prototype.action = function(target, message) {
     var self = this;
@@ -150,7 +166,7 @@ ClientIRC.prototype.whois = function(nick, callback) {
  * specific, this method just passes them through exactly as specified. Responses from the server
  * are available via the channellist_start, channellist_item, and channellist events.
  *
- * @param args
+ * @param {[object]} args
  */
 ClientIRC.prototype.list = function(args) {
     var self = this;
